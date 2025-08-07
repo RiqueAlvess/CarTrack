@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Relatório - CarTrack{% endblock title %}
+
+{% block body %}
+<div class="container mt-3 mb-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Editar Relatório - {{ relatorio.placa_veiculo }}</h4>
+    <a href="{% url 'reports:detail' relatorio.pk %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    <!-- Dados Básicos -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-calendar3 me-2"></i>
+          Dados Básicos
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="data_servico" class="form-label fw-semibold">Data do Serviço</label>
+            <input type="date" class="form-control" id="data_servico" name="data_servico" 
+                   value="{{ relatorio.data_servico|date:'Y-m-d' }}" required>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="hora_inicio" class="form-label fw-semibold">Hora Início</label>
+            <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" 
+                   value="{{ relatorio.hora_inicio|time:'H:i' }}" required>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="hora_fim" class="form-label fw-semibold">Hora Fim</label>
+            <input type="time" class="form-control" id="hora_fim" name="hora_fim" 
+                   value="{% if relatorio.hora_fim %}{{ relatorio.hora_fim|time:'H:i' }}{% endif %}">
+            <div class="form-text">Opcional</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dados do Veículo -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-car-front me-2"></i>
+          Dados do Veículo
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="placa_veiculo" class="form-label fw-semibold">Placa do Veículo</label>
+            <input type="text" class="form-control" id="placa_veiculo" name="placa_veiculo" 
+                   value="{{ relatorio.placa_veiculo }}" required maxlength="10" style="text-transform: uppercase;">
+          </div>
+          <div class="col-12 mb-3">
+            <label for="modelo_veiculo" class="form-label fw-semibold">Modelo</label>
+            <input type="text" class="form-control" id="modelo_veiculo" name="modelo_veiculo" 
+                   value="{{ relatorio.modelo_veiculo }}" placeholder="Ex: Honda Civic, Toyota Corolla">
+          </div>
+          <div class="col-6 mb-3">
+            <label for="cor_veiculo" class="form-label fw-semibold">Cor</label>
+            <input type="text" class="form-control" id="cor_veiculo" name="cor_veiculo" 
+                   value="{{ relatorio.cor_veiculo }}" placeholder="Ex: Branco, Preto">
+          </div>
+          <div class="col-6 mb-3">
+            <label for="quilometragem" class="form-label fw-semibold">Quilometragem</label>
+            <input type="number" class="form-control" id="quilometragem" name="quilometragem" 
+                   value="{{ relatorio.quilometragem|default:'' }}" placeholder="Ex: 50000" min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalhes do Serviço -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-tools me-2"></i>
+          Detalhes do Serviço
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="tipo_servico" class="form-label fw-semibold">Tipo de Serviço</label>
+            <select class="form-select" id="tipo_servico" name="tipo_servico" required>
+              {% for value, label in tipos_servico %}
+                <option value="{{ value }}" {% if relatorio.tipo_servico == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="condicao_inicial" class="form-label fw-semibold">Condição Inicial</label>
+            <select class="form-select" id="condicao_inicial" name="condicao_inicial" required>
+              {% for value, label in condicoes %}
+                <option value="{{ value }}" {% if relatorio.condicao_inicial == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="condicao_final" class="form-label fw-semibold">Condição Final</label>
+            <select class="form-select" id="condicao_final" name="condicao_final">
+              {% for value, label in condicoes %}
+                <option value="{{ value }}" {% if relatorio.condicao_final == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="local_servico" class="form-label fw-semibold">Local do Serviço</label>
+            <input type="text" class="form-control" id="local_servico" name="local_servico" 
+                   value="{{ relatorio.local_servico }}" placeholder="Ex: Pátio da empresa, Garagem">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observações -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-chat-text me-2"></i>
+          Observações
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="observacoes" class="form-label fw-semibold">Observações Gerais</label>
+            <textarea class="form-control" id="observacoes" name="observacoes" rows="3" 
+                      placeholder="Observações sobre o serviço realizado...">{{ relatorio.observacoes }}</textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="problemas_encontrados" class="form-label fw-semibold">Problemas Encontrados</label>
+            <textarea class="form-control" id="problemas_encontrados" name="problemas_encontrados" rows="2" 
+                      placeholder="Riscos, danos ou problemas identificados...">{{ relatorio.problemas_encontrados }}</textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="produtos_utilizados" class="form-label fw-semibold">Produtos Utilizados</label>
+            <textarea class="form-control" id="produtos_utilizados" name="produtos_utilizados" rows="2" 
+                      placeholder="Lista de produtos e materiais utilizados...">{{ relatorio.produtos_utilizados }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avaliação -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-star me-2"></i>
+          Avaliação de Qualidade
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="avaliacao_qualidade" class="form-label fw-semibold">Nota de Qualidade (1-5)</label>
+            <select class="form-select" id="avaliacao_qualidade" name="avaliacao_qualidade">
+              <option value="">Não avaliado</option>
+              {% for i in "12345" %}
+                <option value="{{ i }}" {% if relatorio.avaliacao_qualidade == i|add:0 %}selected{% endif %}>
+                  {{ i }} - {% if i == "1" %}Ruim{% elif i == "2" %}Regular{% elif i == "3" %}Bom{% elif i == "4" %}Muito Bom{% else %}Excelente{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary py-3">
+        <i class="bi bi-check-lg me-2"></i>
+        <strong>Salvar Alterações</strong>
+      </button>
+      <a href="{% url 'reports:detail' relatorio.pk %}" class="btn btn-outline-secondary">
+        <i class="bi bi-x-lg me-2"></i>
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Auto-formatação da placa
+  document.getElementById('placa_veiculo').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (value.length > 3) {
+      value = value.slice(0, 3) + '-' + value.slice(3, 7);
+    }
+    e.target.value = value;
+  });
+</script>
+{% endblock body %}

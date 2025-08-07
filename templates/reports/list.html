@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatórios - CarTrack{% endblock title %}
+
+{% block body %}
+<div class="container mt-3 mb-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Relatórios</h4>
+    <a href="{% url 'core:home' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+  </div>
+
+  <!-- Estatísticas rápidas -->
+  <div class="row mb-4">
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body text-center p-3">
+          <div class="h3 text-primary mb-1">{{ relatorios_hoje }}</div>
+          <div class="text-muted small">Hoje</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body text-center p-3">
+          <div class="h3 text-success mb-1">{{ total_relatorios }}</div>
+          <div class="text-muted small">Total</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abas Histórico/Novo -->
+  <div class="card mb-4">
+    <div class="card-body p-2">
+      <div class="row">
+        <div class="col-6">
+          <button class="btn btn-outline-secondary w-100 {% if not request.GET.status == 'rascunho' %}active{% endif %}">
+            Histórico
+          </button>
+        </div>
+        <div class="col-6">
+          <a href="{% url 'reports:create' %}" class="btn btn-outline-primary w-100">
+            Novo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão Criar Novo Relatório -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <a href="{% url 'reports:create' %}" class="btn btn-primary w-100 py-3">
+        <i class="bi bi-plus-lg me-2"></i>
+        <strong>Criar Novo Relatório</strong>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Filtros</h6>
+    </div>
+    <div class="card-body">
+      <form method="get" class="mb-3">
+        <div class="row">
+          <div class="col-12 mb-2">
+            <input type="text" class="form-control" name="q" placeholder="Buscar por placa, modelo..." value="{{ busca }}">
+          </div>
+          <div class="col-6 mb-2">
+            <select name="status" class="form-select">
+              <option value="">Todos os status</option>
+              <option value="rascunho" {% if status_filter == 'rascunho' %}selected{% endif %}>Rascunho</option>
+              <option value="concluido" {% if status_filter == 'concluido' %}selected{% endif %}>Concluído</option>
+              <option value="enviado" {% if status_filter == 'enviado' %}selected{% endif %}>Enviado</option>
+              <option value="cancelado" {% if status_filter == 'cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+          </div>
+          <div class="col-6 mb-2">
+            <select name="data" class="form-select">
+              <option value="">Todas as datas</option>
+              <option value="hoje" {% if data_filter == 'hoje' %}selected{% endif %}>Hoje</option>
+              <option value="semana" {% if data_filter == 'semana' %}selected{% endif %}>Esta semana</option>
+              <option value="mes" {% if data_filter == 'mes' %}selected{% endif %}>Este mês</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm me-2">
+          <i class="bi bi-search"></i> Filtrar
+        </button>
+        <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-x"></i> Limpar
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de Relatórios -->
+  {% if relatorios %}
+    {% for relatorio in relatorios %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <h6 class="card-title mb-1">
+              <i class="bi bi-car-front me-2 text-primary"></i>
+              {{ relatorio.placa_veiculo }}
+              {% if relatorio.modelo_veiculo %}
+                - {{ relatorio.modelo_veiculo }}
+              {% endif %}
+            </h6>
+            <p class="card-text mb-2">
+              <small class="text-muted">
+                <i class="bi bi-calendar3"></i> {{ relatorio.data_servico|date:"d/m/Y" }}
+                <i class="bi bi-clock ms-3"></i> {{ relatorio.hora_inicio|time:"H:i" }}
+                {% if relatorio.hora_fim %}
+                  - {{ relatorio.hora_fim|time:"H:i" }}
+                  <span class="badge bg-info ms-2">{{ relatorio.duracao_formatada }}</span>
+                {% endif %}
+              </small>
+            </p>
+            <p class="card-text mb-2">
+              <span class="badge bg-secondary me-2">{{ relatorio.get_tipo_servico_display }}</span>
+              <span class="badge 
+                {% if relatorio.status == 'concluido' %}bg-success
+                {% elif relatorio.status == 'enviado' %}bg-primary
+                {% elif relatorio.status == 'rascunho' %}bg-warning
+                {% else %}bg-danger{% endif %}">
+                {{ relatorio.get_status_display }}
+              </span>
+            </p>
+            {% if relatorio.observacoes %}
+            <p class="card-text">
+              <small>{{ relatorio.observacoes|truncatewords:15 }}</small>
+            </p>
+            {% endif %}
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'reports:detail' relatorio.pk %}">
+                <i class="bi bi-eye"></i> Ver detalhes
+              </a></li>
+              <li><a class="dropdown-item" href="{% url 'reports:edit' relatorio.pk %}">
+                <i class="bi bi-pencil"></i> Editar
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{% url 'reports:delete' relatorio.pk %}">
+                <i class="bi bi-trash"></i> Excluir
+              </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Paginação -->
+    {% if relatorios.paginator.num_pages > 1 %}
+    <nav aria-label="Navegação de páginas">
+      <ul class="pagination justify-content-center">
+        {% if relatorios.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ relatorios.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if data_filter %}&data={{ data_filter }}{% endif %}{% if busca %}&q={{ busca }}{% endif %}">Anterior</a>
+          </li>
+        {% endif %}
+        
+        <li class="page-item active">
+          <span class="page-link">{{ relatorios.number }} de {{ relatorios.paginator.num_pages }}</span>
+        </li>
+        
+        {% if relatorios.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ relatorios.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if data_filter %}&data={{ data_filter }}{% endif %}{% if busca %}&q={{ busca }}{% endif %}">Próxima</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+  {% else %}
+    <!-- Estado vazio -->
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-clipboard-data display-1 text-muted mb-3"></i>
+        <h5 class="text-muted">Nenhum relatório encontrado</h5>
+        <p class="text-muted mb-4">
+          {% if busca or status_filter or data_filter %}
+            Tente ajustar os filtros ou <a href="{% url 'reports:list' %}">ver todos os relatórios</a>.
+          {% else %}
+            Comece criando seu primeiro relatório.
+          {% endif %}
+        </p>
+        <a href="{% url 'reports:create' %}" class="btn btn-primary">
+          <i class="bi bi-plus-lg"></i> Criar primeiro relatório
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock body %}

@@ -5,45 +5,45 @@
       <div class="col">
         <a
           href="{% url 'core:home' %}"
-          class="nav-link text-decoration-none {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+          class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
         >
-          <i class="bi bi-house fs-5"></i>
+          <i class="bi bi-house"></i>
           <div class="small">Início</div>
         </a>
       </div>
       <div class="col">
         <a
           href="{% url 'reports:list' %}"
-          class="nav-link text-decoration-none {% if 'reports' in request.resolver_match.namespace %}active{% endif %}"
+          class="nav-link {% if 'reports' in request.resolver_match.namespace %}active{% endif %}"
         >
-          <i class="bi bi-clipboard-data fs-5"></i>
+          <i class="bi bi-clipboard-data"></i>
           <div class="small">Relatórios</div>
         </a>
       </div>
       <div class="col">
         <a
-          href="{% url 'dashboard:dashboard' %}"
-          class="nav-link text-decoration-none {% if 'dashboard' in request.resolver_match.namespace %}active{% endif %}"
+          href="#"
+          class="nav-link {% if 'dashboard' in request.resolver_match.namespace %}active{% endif %}"
         >
-          <i class="bi bi-bar-chart fs-5"></i>
+          <i class="bi bi-bar-chart"></i>
           <div class="small">Dashboard</div>
         </a>
       </div>
       <div class="col">
         <a
-          href="{% url 'emails:list' %}"
-          class="nav-link text-decoration-none {% if 'emails' in request.resolver_match.namespace %}active{% endif %}"
+          href="#"
+          class="nav-link {% if 'emails' in request.resolver_match.namespace %}active{% endif %}"
         >
-          <i class="bi bi-envelope fs-5"></i>
+          <i class="bi bi-envelope"></i>
           <div class="small">E-mails</div>
         </a>
       </div>
       <div class="col">
         <a
           href="{% url 'accounts:profile' %}"
-          class="nav-link text-decoration-none {% if 'accounts' in request.resolver_match.namespace and request.resolver_match.url_name == 'profile' %}active{% endif %}"
+          class="nav-link {% if 'accounts' in request.resolver_match.namespace and request.resolver_match.url_name == 'profile' %}active{% endif %}"
         >
-          <i class="bi bi-person fs-5"></i>
+          <i class="bi bi-person"></i>
           <div class="small">Perfil</div>
         </a>
       </div>

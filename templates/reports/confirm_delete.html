@@ -1,0 +1,122 @@
+{% extends 'base.html' %} {% block title %}Excluir Relatório - CarTrack{%
+endblock title %} {% block body %}
+<div class="container mt-3 mb-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 text-danger">Excluir Relatório</h4>
+    <a
+      href="{% url 'reports:detail' relatorio.pk %}"
+      class="btn btn-outline-secondary btn-sm"
+    >
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <!-- Warning Alert -->
+  <div class="alert alert-danger mb-4">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+      <div>
+        <h6 class="alert-heading mb-1">Atenção!</h6>
+        <p class="mb-0">
+          Esta ação não pode ser desfeita. O relatório será permanentemente
+          excluído.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informações do Relatório -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="bi bi-info-circle me-2"></i>
+        Dados do Relatório a ser Excluído
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Placa do Veículo</label
+          >
+          <div class="fs-5 fw-bold">{{ relatorio.placa_veiculo }}</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Data do Serviço</label
+          >
+          <div>{{ relatorio.data_servico|date:"d/m/Y" }}</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Tipo de Serviço</label
+          >
+          <div>{{ relatorio.get_tipo_servico_display }}</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Status</label>
+          <div>
+            <span
+              class="badge {% if relatorio.status == 'concluido' %}bg-success {% elif relatorio.status == 'enviado' %}bg-primary {% elif relatorio.status == 'rascunho' %}bg-warning {% else %}bg-danger{% endif %}"
+            >
+              {{ relatorio.get_status_display }}
+            </span>
+          </div>
+        </div>
+        {% if relatorio.modelo_veiculo %}
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Modelo</label>
+          <div>{{ relatorio.modelo_veiculo }}</div>
+        </div>
+        {% endif %}
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Data de Criação</label
+          >
+          <div>{{ relatorio.data_criacao|date:"d/m/Y H:i" }}</div>
+        </div>
+        {% if relatorio.observacoes %}
+        <div class="col-12">
+          <label class="form-label fw-semibold text-muted">Observações</label>
+          <div class="bg-light p-3 rounded">
+            {{ relatorio.observacoes|truncatewords:20 }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Confirmação -->
+  <form method="post">
+    {% csrf_token %}
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-danger py-3">
+        <i class="bi bi-trash me-2"></i>
+        <strong>Sim, Excluir Relatório</strong>
+      </button>
+      <div class="row g-2">
+        <div class="col-6">
+          <a
+            href="{% url 'reports:detail' relatorio.pk %}"
+            class="btn btn-outline-secondary w-100"
+          >
+            <i class="bi bi-arrow-left me-2"></i>
+            Cancelar
+          </a>
+        </div>
+        <div class="col-6">
+          <a
+            href="{% url 'reports:list' %}"
+            class="btn btn-outline-primary w-100"
+          >
+            <i class="bi bi-list me-2"></i>
+            Ver Todos
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock body %}

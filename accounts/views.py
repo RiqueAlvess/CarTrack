@@ -32,10 +32,10 @@ def profile_view(request):
     if request.method == 'POST':
         user = request.user
         
-        # Atualizar configurações SMTP
+        # Atualizar configurações SMTP - Agora com Outlook como padrão
         user.smtp_email = request.POST.get('smtp_email', '')
         user.smtp_password = request.POST.get('smtp_password', '')
-        user.smtp_host = request.POST.get('smtp_host', 'smtp.gmail.com')
+        user.smtp_host = request.POST.get('smtp_host', 'smtp-mail.outlook.com')  # Outlook padrão
         user.smtp_port = int(request.POST.get('smtp_port', 587))
         user.smtp_use_tls = request.POST.get('smtp_use_tls') == 'on'
         
@@ -63,18 +63,29 @@ def test_email_view(request):
             server.starttls()
         server.login(user.smtp_email, user.smtp_password)
         
-        # Enviar e-mail de teste para o próprio usuário
+        # Enviar e-mail de teste para o endereço específico do Henrique
+        test_email = 'henrique.alves.siqueira@hotmail.com'
+        
         msg = MIMEMultipart()
         msg['From'] = user.smtp_email
-        msg['To'] = user.smtp_email
+        msg['To'] = test_email
         msg['Subject'] = 'Teste de Configuração SMTP - CarTrack'
         
         body = f"""
-        Olá {user.get_full_name() or user.username},
+        Olá Henrique,
         
-        Este é um e-mail de teste para verificar suas configurações SMTP.
+        Este é um e-mail de teste do sistema CarTrack.
         
-        Se você recebeu este e-mail, suas configurações estão corretas!
+        Usuário que realizou o teste: {user.get_full_name() or user.username}
+        E-mail do usuário: {user.email}
+        Data/Hora do teste: {request.META.get('HTTP_DATE', 'Não informado')}
+        
+        Se você recebeu este e-mail, as configurações SMTP estão funcionando corretamente!
+        
+        Detalhes da configuração:
+        - Servidor SMTP: {user.smtp_host}
+        - Porta: {user.smtp_port}
+        - TLS: {'Ativado' if user.smtp_use_tls else 'Desativado'}
         
         Atenciosamente,
         Sistema CarTrack
@@ -86,7 +97,7 @@ def test_email_view(request):
         
         return JsonResponse({
             'success': True, 
-            'message': 'E-mail de teste enviado com sucesso!'
+            'message': f'E-mail de teste enviado com sucesso para {test_email}!'
         })
         
     except Exception as e:

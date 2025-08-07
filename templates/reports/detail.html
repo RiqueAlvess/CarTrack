@@ -1,0 +1,247 @@
+{% extends 'base.html' %} {% block title %}Relatório {{ relatorio.placa_veiculo
+}} - CarTrack{% endblock title %} {% block body %}
+<div class="container mt-3 mb-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1">Relatório - {{ relatorio.placa_veiculo }}</h4>
+      <small class="text-muted"
+        >{{ relatorio.data_servico|date:"d/m/Y" }}</small
+      >
+    </div>
+    <div>
+      <a
+        href="{% url 'reports:edit' relatorio.pk %}"
+        class="btn btn-outline-primary btn-sm me-2"
+      >
+        <i class="bi bi-pencil"></i>
+      </a>
+      <a
+        href="{% url 'reports:list' %}"
+        class="btn btn-outline-secondary btn-sm"
+      >
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Badge -->
+  <div class="mb-4">
+    <span
+      class="badge fs-6 {% if relatorio.status == 'concluido' %}bg-success {% elif relatorio.status == 'enviado' %}bg-primary {% elif relatorio.status == 'rascunho' %}bg-warning {% else %}bg-danger{% endif %}"
+    >
+      {{ relatorio.get_status_display }}
+    </span>
+    {% if relatorio.avaliacao_qualidade %}
+    <span class="badge bg-info fs-6 ms-2">
+      <i class="bi bi-star-fill"></i> {{ relatorio.avaliacao_qualidade }}/5
+    </span>
+    {% endif %}
+  </div>
+
+  <!-- Dados do Veículo -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="bi bi-car-front me-2"></i>
+        Dados do Veículo
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Placa</label>
+          <div class="fs-5 fw-bold">{{ relatorio.placa_veiculo }}</div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Modelo</label>
+          <div>{{ relatorio.modelo_veiculo|default:"Não informado" }}</div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Cor</label>
+          <div>{{ relatorio.cor_veiculo|default:"Não informado" }}</div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Quilometragem</label>
+          <div>
+            {% if relatorio.quilometragem %} {{
+            relatorio.quilometragem|floatformat:0 }} km {% else %} Não informado
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalhes do Serviço -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="bi bi-tools me-2"></i>
+        Detalhes do Serviço
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Tipo de Serviço</label
+          >
+          <div class="fs-6">{{ relatorio.get_tipo_servico_display }}</div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Condição Inicial</label
+          >
+          <div>
+            <span class="badge bg-secondary"
+              >{{ relatorio.get_condicao_inicial_display }}</span
+            >
+          </div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Condição Final</label
+          >
+          <div>
+            <span class="badge bg-success"
+              >{{ relatorio.get_condicao_final_display }}</span
+            >
+          </div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Hora Início</label>
+          <div>{{ relatorio.hora_inicio|time:"H:i" }}</div>
+        </div>
+        <div class="col-6 mb-3">
+          <label class="form-label fw-semibold text-muted">Hora Fim</label>
+          <div>
+            {% if relatorio.hora_fim %} {{ relatorio.hora_fim|time:"H:i" }}
+            <small class="text-muted ms-2"
+              >({{ relatorio.duracao_formatada }})</small
+            >
+            {% else %}
+            <span class="text-muted">Não informado</span>
+            {% endif %}
+          </div>
+        </div>
+        {% if relatorio.local_servico %}
+        <div class="col-12 mb-3">
+          <label class="form-label fw-semibold text-muted"
+            >Local do Serviço</label
+          >
+          <div>{{ relatorio.local_servico }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Observações -->
+  {% if relatorio.observacoes or relatorio.problemas_encontrados or
+  relatorio.produtos_utilizados %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="bi bi-chat-text me-2"></i>
+        Observações
+      </h6>
+    </div>
+    <div class="card-body">
+      {% if relatorio.observacoes %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold text-muted"
+          >Observações Gerais</label
+        >
+        <div class="bg-light p-3 rounded">
+          {{ relatorio.observacoes|linebreaks }}
+        </div>
+      </div>
+      {% endif %} {% if relatorio.problemas_encontrados %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold text-muted"
+          >Problemas Encontrados</label
+        >
+        <div class="bg-light p-3 rounded">
+          {{ relatorio.problemas_encontrados|linebreaks }}
+        </div>
+      </div>
+      {% endif %} {% if relatorio.produtos_utilizados %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold text-muted"
+          >Produtos Utilizados</label
+        >
+        <div class="bg-light p-3 rounded">
+          {{ relatorio.produtos_utilizados|linebreaks }}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Informações do Sistema -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="bi bi-info-circle me-2"></i>
+        Informações do Sistema
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-6 mb-2">
+          <label class="form-label fw-semibold text-muted">Criado por</label>
+          <div>
+            {{
+            relatorio.usuario.get_full_name|default:relatorio.usuario.username
+            }}
+          </div>
+        </div>
+        <div class="col-6 mb-2">
+          <label class="form-label fw-semibold text-muted">Empresa</label>
+          <div>{{ relatorio.empresa.RAZAOSOCIAL }}</div>
+        </div>
+        <div class="col-6 mb-2">
+          <label class="form-label fw-semibold text-muted">Data Criação</label>
+          <div>{{ relatorio.data_criacao|date:"d/m/Y H:i" }}</div>
+        </div>
+        <div class="col-6 mb-2">
+          <label class="form-label fw-semibold text-muted"
+            >Última Atualização</label
+          >
+          <div>{{ relatorio.data_atualizacao|date:"d/m/Y H:i" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div class="d-grid gap-2">
+    <a href="{% url 'reports:edit' relatorio.pk %}" class="btn btn-primary">
+      <i class="bi bi-pencil me-2"></i>
+      Editar Relatório
+    </a>
+    <div class="row g-2">
+      <div class="col-6">
+        <a
+          href="{% url 'reports:list' %}"
+          class="btn btn-outline-secondary w-100"
+        >
+          <i class="bi bi-arrow-left me-2"></i>
+          Voltar
+        </a>
+      </div>
+      <div class="col-6">
+        <a
+          href="{% url 'reports:delete' relatorio.pk %}"
+          class="btn btn-outline-danger w-100"
+        >
+          <i class="bi bi-trash me-2"></i>
+          Excluir
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock body %}

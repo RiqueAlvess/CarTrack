@@ -1,0 +1,326 @@
+{% extends 'base.html' %} {% block title %}Novo Relatório - CarTrack{% endblock
+title %} {% block body %}
+<div class="container mt-3 mb-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Novo Relatório</h4>
+    <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Dados Básicos -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-calendar3 me-2"></i>
+          Dados Básicos
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="data_servico" class="form-label fw-semibold"
+              >Data do Serviço</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="data_servico"
+              name="data_servico"
+              value="{{ data_hoje|date:'Y-m-d' }}"
+              required
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="hora_inicio" class="form-label fw-semibold"
+              >Hora Início</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_inicio"
+              name="hora_inicio"
+              value="{{ hora_atual }}"
+              required
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="hora_fim" class="form-label fw-semibold"
+              >Hora Fim</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_fim"
+              name="hora_fim"
+            />
+            <div class="form-text">Opcional - preencha quando concluir</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dados do Veículo -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-car-front me-2"></i>
+          Dados do Veículo
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="placa_veiculo" class="form-label fw-semibold"
+              >Placa do Veículo</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="placa_veiculo"
+              name="placa_veiculo"
+              placeholder="ABC-1234"
+              required
+              maxlength="10"
+              style="text-transform: uppercase"
+            />
+          </div>
+          <div class="col-12 mb-3">
+            <label for="modelo_veiculo" class="form-label fw-semibold"
+              >Modelo</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="modelo_veiculo"
+              name="modelo_veiculo"
+              placeholder="Ex: Honda Civic, Toyota Corolla"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="cor_veiculo" class="form-label fw-semibold">Cor</label>
+            <input
+              type="text"
+              class="form-control"
+              id="cor_veiculo"
+              name="cor_veiculo"
+              placeholder="Ex: Branco, Preto"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="quilometragem" class="form-label fw-semibold"
+              >Quilometragem</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="quilometragem"
+              name="quilometragem"
+              placeholder="Ex: 50000"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalhes do Serviço -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-tools me-2"></i>
+          Detalhes do Serviço
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="tipo_servico" class="form-label fw-semibold"
+              >Tipo de Serviço</label
+            >
+            <select
+              class="form-select"
+              id="tipo_servico"
+              name="tipo_servico"
+              required
+            >
+              <option value="">Selecione o tipo de serviço</option>
+              {% for value, label in tipos_servico %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="condicao_inicial" class="form-label fw-semibold"
+              >Condição Inicial</label
+            >
+            <select
+              class="form-select"
+              id="condicao_inicial"
+              name="condicao_inicial"
+              required
+            >
+              <option value="">Selecione</option>
+              {% for value, label in condicoes %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="condicao_final" class="form-label fw-semibold"
+              >Condição Final</label
+            >
+            <select
+              class="form-select"
+              id="condicao_final"
+              name="condicao_final"
+            >
+              <option value="limpo" selected>Limpo</option>
+              {% for value, label in condicoes %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="local_servico" class="form-label fw-semibold"
+              >Local do Serviço</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="local_servico"
+              name="local_servico"
+              placeholder="Ex: Pátio da empresa, Garagem"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observações -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-chat-text me-2"></i>
+          Observações
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="observacoes" class="form-label fw-semibold"
+              >Observações Gerais</label
+            >
+            <textarea
+              class="form-control"
+              id="observacoes"
+              name="observacoes"
+              rows="3"
+              placeholder="Observações sobre o serviço realizado..."
+            ></textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="problemas_encontrados" class="form-label fw-semibold"
+              >Problemas Encontrados</label
+            >
+            <textarea
+              class="form-control"
+              id="problemas_encontrados"
+              name="problemas_encontrados"
+              rows="2"
+              placeholder="Riscos, danos ou problemas identificados..."
+            ></textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="produtos_utilizados" class="form-label fw-semibold"
+              >Produtos Utilizados</label
+            >
+            <textarea
+              class="form-control"
+              id="produtos_utilizados"
+              name="produtos_utilizados"
+              rows="2"
+              placeholder="Lista de produtos e materiais utilizados..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avaliação -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-star me-2"></i>
+          Avaliação de Qualidade
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="avaliacao_qualidade" class="form-label fw-semibold"
+              >Nota de Qualidade (1-5)</label
+            >
+            <select
+              class="form-select"
+              id="avaliacao_qualidade"
+              name="avaliacao_qualidade"
+            >
+              <option value="">Não avaliado</option>
+              <option value="1">1 - Ruim</option>
+              <option value="2">2 - Regular</option>
+              <option value="3">3 - Bom</option>
+              <option value="4">4 - Muito Bom</option>
+              <option value="5" selected>5 - Excelente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary py-3">
+        <i class="bi bi-check-lg me-2"></i>
+        <strong>Salvar Relatório</strong>
+      </button>
+      <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-x-lg me-2"></i>
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Auto-formatação da placa
+  document
+    .getElementById("placa_veiculo")
+    .addEventListener("input", function (e) {
+      let value = e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+      if (value.length > 3) {
+        value = value.slice(0, 3) + "-" + value.slice(3, 7);
+      }
+      e.target.value = value;
+    });
+
+  // Auto-completar hora fim quando hora início for preenchida
+  document
+    .getElementById("hora_inicio")
+    .addEventListener("change", function (e) {
+      const horaInicio = e.target.value;
+      const horaFim = document.getElementById("hora_fim");
+
+      if (horaInicio && !horaFim.value) {
+        // Adiciona 1 hora como sugestão
+        const [horas, minutos] = horaInicio.split(":");
+        const novaHora = (parseInt(horas) + 1).toString().padStart(2, "0");
+        horaFim.value = `${novaHora}:${minutos}`;
+      }
+    });
+</script>
+{% endblock body %}

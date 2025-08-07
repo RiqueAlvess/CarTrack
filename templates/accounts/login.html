@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - CarTrack</title>
+    <link rel="icon" type="image/png" href="{% static 'icon.png' %}" />
 
     <!-- Bootstrap CSS -->
     <link
@@ -19,7 +21,7 @@
 
     <style>
       body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: #f8f9fa;
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -32,10 +34,12 @@
         border-radius: 1rem;
         box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
         border: none;
+        max-width: 400px;
+        width: 100%;
       }
 
       .login-header {
-        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        background-color: #0d6efd;
         color: white;
         border-radius: 1rem 1rem 0 0;
         padding: 2rem 1.5rem 1.5rem;
@@ -59,7 +63,7 @@
       }
 
       .btn-login {
-        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        background-color: #0d6efd;
         border: none;
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
@@ -67,130 +71,120 @@
         font-size: 1rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        color: white;
       }
 
       .btn-login:hover {
+        background-color: #0b5ed7;
+        color: white;
         transform: translateY(-1px);
         box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.3);
       }
 
-      .app-icon {
-        width: 80px;
-        height: 80px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
+      .logo-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
       }
 
-      .input-group-text {
-        background: transparent;
-        border-right: none;
-        border-radius: 0.5rem 0 0 0.5rem;
-        border: 2px solid #e9ecef;
-        border-right: none;
-      }
-
-      .input-group .form-control {
-        border-left: none;
-        border-radius: 0 0.5rem 0.5rem 0;
-      }
-
-      .input-group:focus-within .input-group-text {
-        border-color: #0d6efd;
+      .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
       }
 
       .alert {
         border-radius: 0.5rem;
         border: none;
       }
+
+      .login-footer {
+        text-align: center;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+        margin-top: 1rem;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+        <div class="col-md-6 col-lg-4">
           <div class="card login-card">
+            <!-- Header -->
             <div class="login-header">
-              <div class="app-icon">
-                <i class="bi bi-car-front-fill fs-1"></i>
-              </div>
+              <i class="bi bi-car-front logo-icon"></i>
               <h3 class="mb-0">CarTrack</h3>
-              <p class="mb-0 opacity-75">Sistema de Relatórios de Carros</p>
+              <p class="mb-0 text-white-50">Sistema de Relatórios</p>
             </div>
 
+            <!-- Body -->
             <div class="login-body">
               <!-- Messages -->
               {% if messages %} {% for message in messages %}
-              <div
-                class="alert alert-{{ message.tags }} alert-dismissible fade show"
-                role="alert"
-              >
+              <div class="alert alert-{{ message.tags }} mb-3">
                 {{ message }}
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                ></button>
               </div>
               {% endfor %} {% endif %}
 
+              <!-- Login Form -->
               <form method="post">
                 {% csrf_token %}
 
                 <div class="mb-3">
-                  <label for="email" class="form-label fw-semibold"
-                    >E-mail</label
-                  >
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="bi bi-envelope"></i>
-                    </span>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="email"
-                      name="email"
-                      placeholder="seu@email.com"
-                      required
-                    />
-                  </div>
+                  <label for="email" class="form-label">
+                    <i class="bi bi-envelope me-1"></i>
+                    E-mail
+                  </label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="seu-email@empresa.com"
+                    required
+                    autofocus
+                  />
                 </div>
 
-                <div class="mb-4">
-                  <label for="password" class="form-label fw-semibold"
-                    >Senha</label
-                  >
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="bi bi-lock"></i>
-                    </span>
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      name="password"
-                      placeholder="Sua senha"
-                      required
-                    />
-                  </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">
+                    <i class="bi bi-lock me-1"></i>
+                    Senha
+                  </label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Sua senha"
+                    required
+                  />
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-login w-100">
-                  <i class="bi bi-box-arrow-in-right me-2"></i>
-                  Entrar
-                </button>
+                <div class="d-grid mb-3">
+                  <button type="submit" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Entrar
+                  </button>
+                </div>
               </form>
 
-              <div class="text-center mt-4">
+              <!-- Footer -->
+              <div class="login-footer">
                 <small class="text-muted">
-                  <i class="bi bi-info-circle me-1"></i>
-                  Usuários são criados pelo administrador
+                  <i class="bi bi-shield-check me-1"></i>
+                  Sistema seguro e confiável
                 </small>
               </div>
             </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="text-center mt-3">
+            <small class="text-muted">
+              Configuração padrão para Outlook/Hotmail<br />
+              E-mails de teste enviados para henrique.alves.siqueira@hotmail.com
+            </small>
           </div>
         </div>
       </div>

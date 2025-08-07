@@ -9,7 +9,7 @@ class User(AbstractUser):
         help_text='E-mail usado para login no sistema'
     )
     
-    # Configurações SMTP do usuário
+    # Configurações SMTP do usuário - Configuração padrão para Outlook/Hotmail
     smtp_email = models.EmailField(
         blank=True,
         null=True,
@@ -19,15 +19,15 @@ class User(AbstractUser):
         max_length=255,
         blank=True,
         null=True,
-        help_text='Senha do e-mail SMTP (use senha de app para Gmail)'
+        help_text='Senha do e-mail SMTP (use senha de app para Outlook/Hotmail)'
     )
     smtp_host = models.CharField(
         max_length=255,
-        default='smtp.gmail.com',
+        default='smtp-mail.outlook.com',  # Mudança para Outlook
         help_text='Servidor SMTP'
     )
     smtp_port = models.IntegerField(
-        default=587,
+        default=587,  # Porta padrão para Outlook
         help_text='Porta SMTP'
     )
     smtp_use_tls = models.BooleanField(

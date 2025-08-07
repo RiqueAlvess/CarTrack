@@ -1,18 +1,219 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.utils import timezone
+from django.apps import apps
+from datetime import date, datetime
+from .models import Relatorio
 
 @login_required
-def reports_list_view(request):
-    return render(request, 'reports/list.html')
+def relatorios_list(request):
+    """Lista todos os relatórios do usuário com filtros"""
+    user = request.user
+    
+    # Obter empresa ativa do usuário
+    try:
+        EmpresaAtivaUsuario = apps.get_model('dashboard', 'EmpresaAtivaUsuario')
+        empresa_ativa = EmpresaAtivaUsuario.objects.get(usuario=user)
+        empresa = empresa_ativa.empresa
+    except Exception:
+        messages.error(request, 'Nenhuma empresa ativa selecionada.')
+        return redirect('core:home')
+    
+    # Filtros
+    status_filter = request.GET.get('status', '')
+    data_filter = request.GET.get('data', '')
+    busca = request.GET.get('q', '')
+    
+    # Query base
+    relatorios = Relatorio.objects.filter(
+        usuario=user,
+        empresa=empresa
+    ).select_related('empresa')
+    
+    # Aplicar filtros
+    if status_filter:
+        relatorios = relatorios.filter(status=status_filter)
+    
+    if data_filter:
+        if data_filter == 'hoje':
+            relatorios = relatorios.filter(data_servico=date.today())
+        elif data_filter == 'semana':
+            from datetime import timedelta
+            uma_semana_atras = date.today() - timedelta(days=7)
+            relatorios = relatorios.filter(data_servico__gte=uma_semana_atras)
+        elif data_filter == 'mes':
+            relatorios = relatorios.filter(
+                data_servico__year=date.today().year,
+                data_servico__month=date.today().month
+            )
+    
+    if busca:
+        relatorios = relatorios.filter(
+            Q(placa_veiculo__icontains=busca) |
+            Q(modelo_veiculo__icontains=busca) |
+            Q(local_servico__icontains=busca) |
+            Q(observacoes__icontains=busca)
+        )
+    
+    # Paginação
+    paginator = Paginator(relatorios, 10)  # 10 relatórios por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Estatísticas rápidas
+    total_relatorios = relatorios.count()
+    relatorios_hoje = Relatorio.objects.filter(
+        usuario=user,
+        empresa=empresa,
+        data_servico=date.today()
+    ).count()
+    
+    context = {
+        'relatorios': page_obj,
+        'total_relatorios': total_relatorios,
+        'relatorios_hoje': relatorios_hoje,
+        'status_filter': status_filter,
+        'data_filter': data_filter,
+        'busca': busca,
+        'empresa': empresa,
+    }
+    
+    return render(request, 'reports/list.html', context)
 
 @login_required
-def create_report_view(request):
-    return render(request, 'reports/create.html')
+def relatorio_create(request):
+    """Criar novo relatório"""
+    user = request.user
+    
+    # Obter empresa ativa
+    try:
+        EmpresaAtivaUsuario = apps.get_model('dashboard', 'EmpresaAtivaUsuario')
+        empresa_ativa = EmpresaAtivaUsuario.objects.get(usuario=user)
+        empresa = empresa_ativa.empresa
+    except Exception:
+        messages.error(request, 'Nenhuma empresa ativa selecionada.')
+        return redirect('core:home')
+    
+    if request.method == 'POST':
+        try:
+            # Criar novo relatório com dados do formulário
+            relatorio = Relatorio(
+                usuario=user,
+                empresa=empresa,
+                data_servico=request.POST.get('data_servico') or date.today(),
+                placa_veiculo=request.POST.get('placa_veiculo', '').upper(),
+                modelo_veiculo=request.POST.get('modelo_veiculo', ''),
+                cor_veiculo=request.POST.get('cor_veiculo', ''),
+                quilometragem=request.POST.get('quilometragem') or None,
+                tipo_servico=request.POST.get('tipo_servico'),
+                condicao_inicial=request.POST.get('condicao_inicial'),
+                condicao_final=request.POST.get('condicao_final', 'limpo'),  # padrão
+                hora_inicio=request.POST.get('hora_inicio'),
+                hora_fim=request.POST.get('hora_fim') or None,
+                local_servico=request.POST.get('local_servico', ''),
+                observacoes=request.POST.get('observacoes', ''),
+                problemas_encontrados=request.POST.get('problemas_encontrados', ''),
+                produtos_utilizados=request.POST.get('produtos_utilizados', ''),
+                avaliacao_qualidade=request.POST.get('avaliacao_qualidade') or None,
+                status='concluido'  # Já marca como concluído por padrão
+            )
+            
+            relatorio.save()
+            messages.success(request, f'Relatório para o veículo {relatorio.placa_veiculo} criado com sucesso!')
+            return redirect('reports:detail', pk=relatorio.pk)
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao criar relatório: {str(e)}')
+    
+    # Dados para o formulário
+    context = {
+        'empresa': empresa,
+        'data_hoje': date.today(),
+        'hora_atual': timezone.now().time().strftime('%H:%M'),
+        'tipos_servico': Relatorio.TIPO_SERVICO_CHOICES,
+        'condicoes': Relatorio.CONDICAO_VEICULO_CHOICES,
+    }
+    
+    return render(request, 'reports/create.html', context)
 
 @login_required
-def report_detail_view(request, pk):
-    return render(request, 'reports/detail.html')
+def relatorio_detail(request, pk):
+    """Visualizar detalhes de um relatório"""
+    relatorio = get_object_or_404(
+        Relatorio.objects.select_related('empresa'), 
+        pk=pk,
+        usuario=request.user
+    )
+    
+    context = {
+        'relatorio': relatorio,
+    }
+    
+    return render(request, 'reports/detail.html', context)
 
 @login_required
-def resend_report_view(request, pk):
-    return render(request, 'reports/resend.html')
+def relatorio_edit(request, pk):
+    """Editar um relatório existente"""
+    relatorio = get_object_or_404(
+        Relatorio, 
+        pk=pk,
+        usuario=request.user
+    )
+    
+    if request.method == 'POST':
+        try:
+            # Atualizar campos do relatório
+            relatorio.data_servico = request.POST.get('data_servico') or relatorio.data_servico
+            relatorio.placa_veiculo = request.POST.get('placa_veiculo', '').upper()
+            relatorio.modelo_veiculo = request.POST.get('modelo_veiculo', '')
+            relatorio.cor_veiculo = request.POST.get('cor_veiculo', '')
+            relatorio.quilometragem = request.POST.get('quilometragem') or None
+            relatorio.tipo_servico = request.POST.get('tipo_servico')
+            relatorio.condicao_inicial = request.POST.get('condicao_inicial')
+            relatorio.condicao_final = request.POST.get('condicao_final')
+            relatorio.hora_inicio = request.POST.get('hora_inicio')
+            relatorio.hora_fim = request.POST.get('hora_fim') or None
+            relatorio.local_servico = request.POST.get('local_servico', '')
+            relatorio.observacoes = request.POST.get('observacoes', '')
+            relatorio.problemas_encontrados = request.POST.get('problemas_encontrados', '')
+            relatorio.produtos_utilizados = request.POST.get('produtos_utilizados', '')
+            relatorio.avaliacao_qualidade = request.POST.get('avaliacao_qualidade') or None
+            
+            relatorio.save()
+            messages.success(request, 'Relatório atualizado com sucesso!')
+            return redirect('reports:detail', pk=relatorio.pk)
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar relatório: {str(e)}')
+    
+    context = {
+        'relatorio': relatorio,
+        'tipos_servico': Relatorio.TIPO_SERVICO_CHOICES,
+        'condicoes': Relatorio.CONDICAO_VEICULO_CHOICES,
+    }
+    
+    return render(request, 'reports/edit.html', context)
+
+@login_required
+def relatorio_delete(request, pk):
+    """Deletar um relatório"""
+    relatorio = get_object_or_404(
+        Relatorio,
+        pk=pk,
+        usuario=request.user
+    )
+    
+    if request.method == 'POST':
+        placa = relatorio.placa_veiculo
+        relatorio.delete()
+        messages.success(request, f'Relatório do veículo {placa} foi excluído.')
+        return redirect('reports:list')
+    
+    context = {
+        'relatorio': relatorio,
+    }
+    
+    return render(request, 'reports/confirm_delete.html', context)
