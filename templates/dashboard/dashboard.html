@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% block title %}Dashboard - CarTrack{% endblock %} {%
+block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Dashboard</h4>
+  </div>
+
+  <!-- Cards de Estatísticas -->
+  <div class="row g-3 mb-4">
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary mb-1">348</h3>
+          <div class="fw-semibold">Carros Limpos</div>
+          <small class="text-muted">Este mês</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-warning mb-1">89</h3>
+          <div class="fw-semibold">Previsão Drops</div>
+          <small class="text-muted">Esta semana</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success mb-1">23</h3>
+          <div class="fw-semibold">Relatórios Enviados</div>
+          <small class="text-muted">Este mês</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-info mb-1">11.2</h3>
+          <div class="fw-semibold">Média Diária</div>
+          <small class="text-muted">Carros/dia</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de Carros Limpos -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Carros Limpos - Últimos 7 dias</h6>
+    </div>
+    <div class="card-body">
+      <canvas id="cleanedCarsChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Gráfico de Previsão de Drops -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Previsão de Drops - Últimos 7 dias</h6>
+    </div>
+    <div class="card-body">
+      <canvas id="dropsChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Resumo da Semana -->
+  <div class="card">
+    <div class="card-header">
+      <h6 class="mb-0">Resumo da Semana</h6>
+    </div>
+    <div class="card-body">
+      <div class="row text-center">
+        <div class="col-6 mb-3">
+          <div class="fw-semibold">Total de carros limpos</div>
+          <div class="h5 text-primary">288</div>
+        </div>
+        <div class="col-6 mb-3">
+          <div class="fw-semibold">Total de drops</div>
+          <div class="h5 text-warning">70</div>
+        </div>
+        <div class="col-6">
+          <div class="fw-semibold">Relatórios enviados</div>
+          <div class="h5 text-success">7/7</div>
+        </div>
+        <div class="col-6">
+          <div class="fw-semibold">Performance</div>
+          <div class="h5 text-info">+12%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simulação de gráficos (será implementado com Chart.js posteriormente)
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Dashboard carregado - gráficos serão implementados");
+  });
+</script>
+{% endblock %}

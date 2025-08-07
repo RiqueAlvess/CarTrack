@@ -1,0 +1,170 @@
+{% extends 'base.html' %} {% block title %}Dashboard Admin - CarTrack{% endblock
+%} {% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Dashboard Administrativo</h4>
+    <a href="{% url 'admin:index' %}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-gear"></i> Admin
+    </a>
+  </div>
+
+  <!-- Estatísticas Gerais -->
+  <div class="row g-3 mb-4">
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary mb-1">{{ general_stats.total_users }}</h3>
+          <div class="fw-semibold">Usuários Ativos</div>
+          <small class="text-muted">Total no sistema</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success mb-1">{{ general_stats.total_reports }}</h3>
+          <div class="fw-semibold">Total Relatórios</div>
+          <small class="text-muted">Todos os tempos</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-info mb-1">{{ general_stats.reports_this_month }}</h3>
+          <div class="fw-semibold">Este Mês</div>
+          <small class="text-muted">Relatórios criados</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-warning mb-1">
+            {{ general_stats.active_users_today }}
+          </h3>
+          <div class="fw-semibold">Usuários Hoje</div>
+          <small class="text-muted">Relatórios criados</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Totais Consolidados -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h6 class="mb-0">
+        <i class="bi bi-bar-chart me-2"></i>
+        Dados Consolidados
+      </h6>
+    </div>
+    <div class="card-body">
+      <div class="row text-center">
+        <div class="col-4">
+          <div class="fw-semibold text-muted">Total Carros Limpos</div>
+          <div class="h4 text-primary">
+            {{ consolidated_totals.total_cars_cleaned|default:0 }}
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="fw-semibold text-muted">Total Drops</div>
+          <div class="h4 text-warning">
+            {{ consolidated_totals.total_forecasted_drops|default:0 }}
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="fw-semibold text-muted">Média por Relatório</div>
+          <div class="h4 text-success">
+            {{ consolidated_totals.avg_cars_per_report|floatformat:1|default:0
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dados dos Últimos 7 Dias -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Atividade - Últimos 7 dias</h6>
+    </div>
+    <div class="card-body">
+      <div class="row text-center">
+        {% for day in daily_consolidated %}
+        <div class="col">
+          <div class="mb-2">
+            <div
+              class="bg-primary rounded"
+              style="height: {{ day.cars|add:1 }}px; width: 100%; max-height: 50px; min-height: 3px;"
+            ></div>
+          </div>
+          <small class="text-muted">{{ day.day }}</small>
+          <div class="fw-semibold small">{{ day.cars }}</div>
+          <div class="text-muted small">{{ day.users }} users</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranking de Usuários -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Ranking de Usuários</h6>
+    </div>
+    <div class="card-body">
+      {% for user_stat in user_stats|slice:":10" %}
+      <div
+        class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded"
+      >
+        <div>
+          <div class="fw-semibold">
+            {{ user_stat.user.get_full_name|default:user_stat.user.username }}
+          </div>
+          <small class="text-muted">{{ user_stat.user.email }}</small>
+        </div>
+        <div class="text-end">
+          <div class="fw-semibold text-primary">
+            {{ user_stat.total_cars }} carros
+          </div>
+          <small class="text-muted"
+            >{{ user_stat.total_reports }} relatórios</small
+          >
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-muted text-center">Nenhum usuário com relatórios ainda</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Status dos E-mails -->
+  <div class="card">
+    <div class="card-header">
+      <h6 class="mb-0">Status dos E-mails</h6>
+    </div>
+    <div class="card-body">
+      <div class="row text-center">
+        {% for status in email_stats %}
+        <div class="col-4">
+          <div class="fw-semibold">
+            {% if status.email_status == 'sent' %}
+            <span class="text-success">Enviados</span>
+            {% elif status.email_status == 'error' %}
+            <span class="text-danger">Com Erro</span>
+            {% else %}
+            <span class="text-warning">Não Enviados</span>
+            {% endif %}
+          </div>
+          <div class="h5">{{ status.count }}</div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <p class="text-muted">Nenhum relatório criado ainda</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

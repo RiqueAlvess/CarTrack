@@ -1,247 +1,227 @@
-{% extends 'base.html' %} {% block title %}Relatório {{ relatorio.placa_veiculo
-}} - CarTrack{% endblock title %} {% block body %}
-<div class="container mt-3 mb-4">
-  <!-- Header -->
+{% extends 'base.html' %} {% block title %}Detalhes do Relatório - CarTrack{%
+endblock %} {% block content %}
+<div class="container-fluid">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h4 class="mb-1">Relatório - {{ relatorio.placa_veiculo }}</h4>
-      <small class="text-muted"
-        >{{ relatorio.data_servico|date:"d/m/Y" }}</small
-      >
-    </div>
-    <div>
-      <a
-        href="{% url 'reports:edit' relatorio.pk %}"
-        class="btn btn-outline-primary btn-sm me-2"
-      >
-        <i class="bi bi-pencil"></i>
-      </a>
-      <a
-        href="{% url 'reports:list' %}"
-        class="btn btn-outline-secondary btn-sm"
-      >
-        <i class="bi bi-arrow-left"></i>
-      </a>
-    </div>
+    <h4 class="mb-0">Detalhes do Relatório</h4>
+    <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left"></i>
+    </a>
   </div>
 
-  <!-- Status Badge -->
-  <div class="mb-4">
-    <span
-      class="badge fs-6 {% if relatorio.status == 'concluido' %}bg-success {% elif relatorio.status == 'enviado' %}bg-primary {% elif relatorio.status == 'rascunho' %}bg-warning {% else %}bg-danger{% endif %}"
-    >
-      {{ relatorio.get_status_display }}
-    </span>
-    {% if relatorio.avaliacao_qualidade %}
-    <span class="badge bg-info fs-6 ms-2">
-      <i class="bi bi-star-fill"></i> {{ relatorio.avaliacao_qualidade }}/5
-    </span>
-    {% endif %}
-  </div>
-
-  <!-- Dados do Veículo -->
+  <!-- Informações Básicas -->
   <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header bg-primary text-white">
       <h6 class="mb-0">
-        <i class="bi bi-car-front me-2"></i>
-        Dados do Veículo
+        <i class="bi bi-info-circle me-2"></i>
+        Informações Básicas
       </h6>
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Placa</label>
-          <div class="fs-5 fw-bold">{{ relatorio.placa_veiculo }}</div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Modelo</label>
-          <div>{{ relatorio.modelo_veiculo|default:"Não informado" }}</div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Cor</label>
-          <div>{{ relatorio.cor_veiculo|default:"Não informado" }}</div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Quilometragem</label>
-          <div>
-            {% if relatorio.quilometragem %} {{
-            relatorio.quilometragem|floatformat:0 }} km {% else %} Não informado
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Detalhes do Serviço -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h6 class="mb-0">
-        <i class="bi bi-tools me-2"></i>
-        Detalhes do Serviço
-      </h6>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-12 mb-3">
-          <label class="form-label fw-semibold text-muted"
-            >Tipo de Serviço</label
-          >
-          <div class="fs-6">{{ relatorio.get_tipo_servico_display }}</div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted"
-            >Condição Inicial</label
-          >
-          <div>
-            <span class="badge bg-secondary"
-              >{{ relatorio.get_condicao_inicial_display }}</span
+        <div class="col-6">
+          <div class="mb-2">
+            <strong>Data/Hora:</strong><br />
+            <span class="text-muted"
+              >{{ report.created_at|date:"d/m/Y H:i" }}</span
             >
           </div>
         </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted"
-            >Condição Final</label
-          >
-          <div>
-            <span class="badge bg-success"
-              >{{ relatorio.get_condicao_final_display }}</span
-            >
-          </div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Hora Início</label>
-          <div>{{ relatorio.hora_inicio|time:"H:i" }}</div>
-        </div>
-        <div class="col-6 mb-3">
-          <label class="form-label fw-semibold text-muted">Hora Fim</label>
-          <div>
-            {% if relatorio.hora_fim %} {{ relatorio.hora_fim|time:"H:i" }}
-            <small class="text-muted ms-2"
-              >({{ relatorio.duracao_formatada }})</small
-            >
+        <div class="col-6">
+          <div class="mb-2">
+            <strong>Status E-mail:</strong><br />
+            {% if report.email_status == 'sent' %}
+            <span class="badge bg-success">Enviado</span>
+            {% elif report.email_status == 'error' %}
+            <span class="badge bg-danger">Erro</span>
             {% else %}
-            <span class="text-muted">Não informado</span>
+            <span class="badge bg-warning">Não enviado</span>
             {% endif %}
           </div>
         </div>
-        {% if relatorio.local_servico %}
-        <div class="col-12 mb-3">
-          <label class="form-label fw-semibold text-muted"
-            >Local do Serviço</label
-          >
-          <div>{{ relatorio.local_servico }}</div>
-        </div>
-        {% endif %}
       </div>
-    </div>
-  </div>
 
-  <!-- Observações -->
-  {% if relatorio.observacoes or relatorio.problemas_encontrados or
-  relatorio.produtos_utilizados %}
-  <div class="card mb-4">
-    <div class="card-header">
-      <h6 class="mb-0">
-        <i class="bi bi-chat-text me-2"></i>
-        Observações
-      </h6>
-    </div>
-    <div class="card-body">
-      {% if relatorio.observacoes %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold text-muted"
-          >Observações Gerais</label
-        >
-        <div class="bg-light p-3 rounded">
-          {{ relatorio.observacoes|linebreaks }}
+      {% if report.email_sent_at %}
+      <div class="row">
+        <div class="col-12">
+          <div class="mb-2">
+            <strong>Enviado em:</strong><br />
+            <span class="text-muted"
+              >{{ report.email_sent_at|date:"d/m/Y H:i" }}</span
+            >
+          </div>
         </div>
       </div>
-      {% endif %} {% if relatorio.problemas_encontrados %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold text-muted"
-          >Problemas Encontrados</label
-        >
-        <div class="bg-light p-3 rounded">
-          {{ relatorio.problemas_encontrados|linebreaks }}
-        </div>
-      </div>
-      {% endif %} {% if relatorio.produtos_utilizados %}
-      <div class="mb-3">
-        <label class="form-label fw-semibold text-muted"
-          >Produtos Utilizados</label
-        >
-        <div class="bg-light p-3 rounded">
-          {{ relatorio.produtos_utilizados|linebreaks }}
-        </div>
+      {% endif %} {% if report.error_message %}
+      <div class="alert alert-danger mt-3">
+        <strong>Erro no envio:</strong><br />
+        {{ report.error_message }}
       </div>
       {% endif %}
     </div>
   </div>
-  {% endif %}
 
-  <!-- Informações do Sistema -->
+  <!-- Dados do Relatório -->
   <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header bg-success text-white">
       <h6 class="mb-0">
-        <i class="bi bi-info-circle me-2"></i>
-        Informações do Sistema
+        <i class="bi bi-clipboard-data me-2"></i>
+        Dados do Relatório
       </h6>
     </div>
     <div class="card-body">
-      <div class="row">
-        <div class="col-6 mb-2">
-          <label class="form-label fw-semibold text-muted">Criado por</label>
-          <div>
-            {{
-            relatorio.usuario.get_full_name|default:relatorio.usuario.username
-            }}
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Ready Line</div>
+            <div class="h5 text-primary">{{ report.ready_line }}</div>
           </div>
         </div>
-        <div class="col-6 mb-2">
-          <label class="form-label fw-semibold text-muted">Empresa</label>
-          <div>{{ relatorio.empresa.RAZAOSOCIAL }}</div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">VIP Line</div>
+            <div class="h5 text-primary">{{ report.vip_line }}</div>
+          </div>
         </div>
-        <div class="col-6 mb-2">
-          <label class="form-label fw-semibold text-muted">Data Criação</label>
-          <div>{{ relatorio.data_criacao|date:"d/m/Y H:i" }}</div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Overflow Kiosk</div>
+            <div class="h5 text-primary">{{ report.overflow_kiosk }}</div>
+          </div>
         </div>
-        <div class="col-6 mb-2">
-          <label class="form-label fw-semibold text-muted"
-            >Última Atualização</label
-          >
-          <div>{{ relatorio.data_atualizacao|date:"d/m/Y H:i" }}</div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Overflow 2</div>
+            <div class="h5 text-primary">{{ report.overflow_2 }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Black Top</div>
+            <div class="h5 text-primary">{{ report.black_top }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Return Line</div>
+            <div class="h5 text-primary">{{ report.return_line }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Mecânico</div>
+            <div class="h5 text-primary">{{ report.mecanico }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Gas Run</div>
+            <div class="h5 text-primary">{{ report.gas_run }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Total Cleaned</div>
+            <div class="h5 text-success">{{ report.total_cleaned }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="fw-semibold">Forecasted Drops</div>
+            <div class="h5 text-warning">{{ report.forecasted_drops }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo -->
+  <div class="card mb-4">
+    <div class="card-header bg-info text-white">
+      <h6 class="mb-0">
+        <i class="bi bi-calculator me-2"></i>
+        Resumo Calculado
+      </h6>
+    </div>
+    <div class="card-body text-center">
+      <div class="row">
+        <div class="col-12">
+          <div class="mb-2">
+            <div class="fw-semibold text-muted">Total de Carros Limpos</div>
+            <div class="display-6 text-primary">
+              {{ report.total_cars_cleaned }}
+            </div>
+            <small class="text-muted">Soma de todas as categorias</small>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Ações -->
-  <div class="d-grid gap-2">
-    <a href="{% url 'reports:edit' relatorio.pk %}" class="btn btn-primary">
-      <i class="bi bi-pencil me-2"></i>
-      Editar Relatório
-    </a>
-    <div class="row g-2">
-      <div class="col-6">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-grid gap-2">
         <a
-          href="{% url 'reports:list' %}"
-          class="btn btn-outline-secondary w-100"
+          href="{% url 'reports:copy' report.pk %}"
+          class="btn btn-outline-primary"
         >
-          <i class="bi bi-arrow-left me-2"></i>
-          Voltar
+          <i class="bi bi-clipboard me-2"></i>
+          Copiar Conteúdo
         </a>
-      </div>
-      <div class="col-6">
-        <a
-          href="{% url 'reports:delete' relatorio.pk %}"
-          class="btn btn-outline-danger w-100"
-        >
-          <i class="bi bi-trash me-2"></i>
-          Excluir
+
+        {% if report.can_resend %}
+        <button class="btn btn-success" onclick="resendReport({{ report.pk }})">
+          <i class="bi bi-send me-2"></i>
+          Reenviar por E-mail
+        </button>
+        {% endif %}
+
+        <a href="{% url 'reports:list' %}" class="btn btn-secondary">
+          <i class="bi bi-arrow-left me-2"></i>
+          Voltar aos Relatórios
         </a>
       </div>
     </div>
   </div>
 </div>
-{% endblock body %}
+
+<script>
+  function resendReport(reportId) {
+    if (!confirm("Deseja reenviar este relatório por e-mail?")) return;
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
+    fetch(`/reports/${reportId}/resend/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+          .value,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+
+        if (data.success) {
+          alert(data.message);
+          location.reload();
+        } else {
+          alert("Erro: " + data.message);
+        }
+      })
+      .catch((error) => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert("Erro na requisição");
+        console.error("Error:", error);
+      });
+  }
+</script>
+{% endblock %}

@@ -1,285 +1,155 @@
 {% extends 'base.html' %} {% block title %}Novo Relatório - CarTrack{% endblock
-title %} {% block body %}
-<div class="container mt-3 mb-4">
-  <!-- Header -->
+%} {% block content %}
+<div class="container-fluid">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Novo Relatório</h4>
     <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary btn-sm">
-      <i class="bi bi-arrow-left"></i> Voltar
+      <i class="bi bi-arrow-left"></i>
     </a>
   </div>
 
   <form method="post">
     {% csrf_token %}
 
-    <!-- Data do Relatório -->
     <div class="card mb-4">
-      <div class="card-header">
+      <div class="card-header bg-primary text-white">
         <h6 class="mb-0">
-          <i class="bi bi-calendar3 me-2"></i>
-          Data do Relatório
+          <i class="bi bi-clipboard-data me-2"></i>
+          Dados do Relatório
         </h6>
       </div>
       <div class="card-body">
-        <div class="row">
-          <div class="col-12 mb-3">
-            <label for="data_servico" class="form-label fw-semibold"
-              >Data</label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="data_servico"
-              name="data_servico"
-              value="{{ data_hoje|date:'Y-m-d' }}"
-              required
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contagem de Carros por Área -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h6 class="mb-0">
-          <i class="bi bi-car-front me-2"></i>
-          Contagem de Carros por Área
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-6 mb-3">
-            <label for="ready_line" class="form-label fw-semibold"
-              >Ready Line</label
-            >
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">Ready Line</label>
             <input
               type="number"
               class="form-control"
-              id="ready_line"
               name="ready_line"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="vip_line" class="form-label fw-semibold"
-              >VIP Line</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">VIP Line</label>
             <input
               type="number"
               class="form-control"
-              id="vip_line"
               name="vip_line"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="overflow_kiosk" class="form-label fw-semibold"
-              >Overflow Kiosk</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Overflow Kiosk</label>
             <input
               type="number"
               class="form-control"
-              id="overflow_kiosk"
               name="overflow_kiosk"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="overflow_2" class="form-label fw-semibold"
-              >Overflow 2</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Overflow 2</label>
             <input
               type="number"
               class="form-control"
-              id="overflow_2"
               name="overflow_2"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="black_top" class="form-label fw-semibold"
-              >Black Top</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Black Top</label>
             <input
               type="number"
               class="form-control"
-              id="black_top"
               name="black_top"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="return_line" class="form-label fw-semibold"
-              >Return</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Return Line</label>
             <input
               type="number"
               class="form-control"
-              id="return_line"
               name="return_line"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="mecanico" class="form-label fw-semibold"
-              >Mecânico</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Mecânico</label>
             <input
               type="number"
               class="form-control"
-              id="mecanico"
               name="mecanico"
               value="0"
               min="0"
-              required
             />
           </div>
-          <div class="col-6 mb-3">
-            <label for="gas_run" class="form-label fw-semibold">Gas Run</label>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Gas Run</label>
             <input
               type="number"
               class="form-control"
-              id="gas_run"
               name="gas_run"
               value="0"
               min="0"
-              required
             />
           </div>
-        </div>
-
-        <!-- Total Calculado Automaticamente -->
-        <div class="alert alert-info mt-3">
-          <i class="bi bi-info-circle me-2"></i>
-          <strong>Total de carros limpos:</strong>
-          <span id="total_display">0</span> (calculado automaticamente)
-        </div>
-      </div>
-    </div>
-
-    <!-- Previsão -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h6 class="mb-0">
-          <i class="bi bi-graph-up me-2"></i>
-          Previsão
-        </h6>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-12 mb-3">
-            <label for="forecasted_drops" class="form-label fw-semibold"
-              >Forecasted Drops</label
-            >
+          <div class="col-6">
+            <label class="form-label fw-semibold">Total Cleaned</label>
             <input
               type="number"
               class="form-control"
-              id="forecasted_drops"
+              name="total_cleaned"
+              value="0"
+              min="0"
+            />
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Forecasted Drops</label>
+            <input
+              type="number"
+              class="form-control"
               name="forecasted_drops"
               value="0"
               min="0"
-              required
             />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Observações (Opcional) -->
     <div class="card mb-4">
-      <div class="card-header">
-        <h6 class="mb-0">
-          <i class="bi bi-chat-text me-2"></i>
-          Observações (Opcional)
-        </h6>
-      </div>
       <div class="card-body">
-        <div class="row">
-          <div class="col-12 mb-3">
-            <label for="observacoes" class="form-label fw-semibold"
-              >Observações</label
-            >
-            <textarea
-              class="form-control"
-              id="observacoes"
-              name="observacoes"
-              rows="3"
-              placeholder="Observações adicionais sobre o relatório..."
-            ></textarea>
-          </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="send_email"
+            name="send_email"
+          />
+          <label class="form-check-label fw-semibold" for="send_email">
+            <i class="bi bi-envelope me-2"></i>
+            Enviar por e-mail agora
+          </label>
         </div>
       </div>
     </div>
 
-    <!-- Botões de Ação -->
     <div class="d-grid gap-2">
-      <button type="submit" class="btn btn-primary py-3">
+      <button type="submit" class="btn btn-primary btn-lg">
         <i class="bi bi-check-lg me-2"></i>
-        <strong>Salvar Relatório</strong>
+        Salvar Relatório
       </button>
       <a href="{% url 'reports:list' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-x-lg me-2"></i>
         Cancelar
       </a>
     </div>
   </form>
 </div>
-
-<script>
-  // Calcular total automaticamente
-  function calculateTotal() {
-    const fields = [
-      "ready_line",
-      "vip_line",
-      "overflow_kiosk",
-      "overflow_2",
-      "black_top",
-      "return_line",
-      "mecanico",
-      "gas_run",
-    ];
-
-    let total = 0;
-    fields.forEach((field) => {
-      const value = parseInt(document.getElementById(field).value) || 0;
-      total += value;
-    });
-
-    document.getElementById("total_display").textContent = total;
-  }
-
-  // Adicionar event listeners para todos os campos numéricos
-  document.addEventListener("DOMContentLoaded", function () {
-    const numericFields = [
-      "ready_line",
-      "vip_line",
-      "overflow_kiosk",
-      "overflow_2",
-      "black_top",
-      "return_line",
-      "mecanico",
-      "gas_run",
-    ];
-
-    numericFields.forEach((field) => {
-      document.getElementById(field).addEventListener("input", calculateTotal);
-    });
-
-    // Calcular total inicial
-    calculateTotal();
-  });
-</script>
-{% endblock body %}
+{% endblock %}

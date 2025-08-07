@@ -1,100 +1,51 @@
 from django.contrib import admin
-from .models import Relatorio, ImagemRelatorio
+from .models import Report
 
-class ImagemRelatorioInline(admin.TabularInline):
-    model = ImagemRelatorio
-    extra = 1
-    readonly_fields = ('data_upload',)
-
-@admin.register(Relatorio)
-class RelatorioAdmin(admin.ModelAdmin):
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
     list_display = (
-        'usuario',
-        'data_formatada',
-        'hora_formatada',
-        'total_carros',
-        'total_cleaned',
+        'user', 
+        'created_at', 
+        'total_cars_cleaned',
+        'total_cleaned', 
         'forecasted_drops',
-        'email_enviado',
-        'enviar_por_email'
+        'email_status',
+        'send_email'
     )
     
     list_filter = (
-        'email_enviado',
-        'enviar_por_email',
-        'data_criacao',
-        'usuario'
+        'email_status',
+        'send_email',
+        'created_at',
+        'user'
     )
     
     search_fields = (
-        'usuario__email',
-        'usuario__first_name',
-        'usuario__last_name'
+        'user__username',
+        'user__email',
+        'user__first_name',
+        'user__last_name'
     )
     
-    readonly_fields = (
-        'data_criacao',
-        'data_atualizacao',
-        'total_carros'
-    )
+    readonly_fields = ('created_at', 'updated_at', 'email_sent_at')
     
     fieldsets = (
         ('Informações Básicas', {
-            'fields': (
-                'usuario',
-                'data_criacao',
-                'data_atualizacao'
-            )
+            'fields': ('user', 'created_at', 'updated_at')
         }),
         ('Dados do Relatório', {
             'fields': (
-                'ready_line',
-                'vip_line',
-                'overflow_kiosk',
-                'overflow_2',
-                'black_top',
-                'return_line',
-                'mecanico',
-                'gas_run',
-                'total_cleaned',
-                'forecasted_drops'
+                'ready_line', 'vip_line', 'overflow_kiosk', 'overflow_2',
+                'black_top', 'return_line', 'mecanico', 'gas_run',
+                'total_cleaned', 'forecasted_drops'
             )
         }),
-        ('Configurações de E-mail', {
+        ('Controle de E-mail', {
             'fields': (
-                'enviar_por_email',
-                'email_enviado',
-                'tentativas_envio',
-                'erro_envio'
+                'send_email', 'email_status', 'email_sent_at', 'error_message'
             )
         }),
     )
     
-    inlines = [ImagemRelatorioInline]
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(usuario=request.user)
-
-@admin.register(ImagemRelatorio)
-class ImagemRelatorioAdmin(admin.ModelAdmin):
-    list_display = (
-        'relatorio',
-        'descricao',
-        'data_upload'
-    )
-    
-    list_filter = (
-        'data_upload',
-        'relatorio__usuario'
-    )
-    
-    readonly_fields = ('data_upload',)
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(relatorio__usuario=request.user)
+    date_hierarchy = 'created_at'
+    ordering = ['-created_at']

@@ -1,0 +1,137 @@
+{% extends 'base.html' %} {% block title %}Gerenciar E-mails - CarTrack{%
+endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Gerenciar E-mails</h4>
+  </div>
+
+  <!-- Adicionar Destinatário -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h6 class="mb-0">Adicionar Destinatário</h6>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Endereço de e-mail</label>
+          <input
+            type="email"
+            class="form-control"
+            name="email"
+            placeholder="exemplo@empresa.com"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Nome (opcional)</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            placeholder="Nome do destinatário"
+          />
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            Adicionar E-mail
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de Destinatários -->
+  {% if recipients_count > 0 %}
+  <div class="mb-3">
+    <h6>Destinatários Cadastrados ({{ recipients_count }})</h6>
+  </div>
+
+  <div class="list-group mb-4">
+    {% for recipient in recipients %}
+    <div
+      class="list-group-item d-flex justify-content-between align-items-center"
+    >
+      <div>
+        <div class="fw-semibold">{{ recipient.email }}</div>
+        <small class="text-muted"
+          >{{ recipient.name|default:"Destinatário de relatórios" }}</small
+        >
+      </div>
+      <div class="btn-group">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          onclick="toggleStatus({{ recipient.pk }})"
+        >
+          {% if recipient.is_active %}
+          <i class="bi bi-toggle-on text-success"></i>
+          {% else %}
+          <i class="bi bi-toggle-off text-muted"></i>
+          {% endif %}
+        </button>
+        <a
+          href="{% url 'emails:delete' recipient.pk %}"
+          class="btn btn-danger btn-sm"
+        >
+          <i class="bi bi-trash"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card mb-4">
+    <div class="card-body text-center">
+      <i class="bi bi-envelope-x fs-1 text-muted mb-2"></i>
+      <h5>Nenhum destinatário cadastrado</h5>
+      <p class="text-muted">Adicione e-mails para receber os relatórios</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Informações Importantes -->
+  <div class="card">
+    <div class="card-header">
+      <h6 class="mb-0">Informações Importantes</h6>
+    </div>
+    <div class="card-body">
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2">
+          <i class="bi bi-info-circle text-info me-2"></i>
+          Relatórios serão enviados para todos os e-mails ativos
+        </li>
+        <li>
+          <i class="bi bi-shield-check text-success me-2"></i>
+          Verifique se os e-mails estão corretos antes de salvar
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleStatus(recipientId) {
+    fetch(`/emails/${recipientId}/toggle/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+          .value,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert("Erro ao alterar status");
+        }
+      })
+      .catch((error) => {
+        alert("Erro na requisição");
+        console.error("Error:", error);
+      });
+  }
+</script>
+{% endblock %}
