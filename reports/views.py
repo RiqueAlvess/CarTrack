@@ -104,25 +104,25 @@ def relatorio_create(request):
                 usuario=user,
                 empresa=empresa,
                 data_servico=request.POST.get('data_servico') or date.today(),
-                placa_veiculo=request.POST.get('placa_veiculo', '').upper(),
-                modelo_veiculo=request.POST.get('modelo_veiculo', ''),
-                cor_veiculo=request.POST.get('cor_veiculo', ''),
-                quilometragem=request.POST.get('quilometragem') or None,
-                tipo_servico=request.POST.get('tipo_servico'),
-                condicao_inicial=request.POST.get('condicao_inicial'),
-                condicao_final=request.POST.get('condicao_final', 'limpo'),  # padrão
-                hora_inicio=request.POST.get('hora_inicio'),
-                hora_fim=request.POST.get('hora_fim') or None,
-                local_servico=request.POST.get('local_servico', ''),
+                
+                # Campos de contagem
+                ready_line=int(request.POST.get('ready_line', 0)),
+                vip_line=int(request.POST.get('vip_line', 0)),
+                overflow_kiosk=int(request.POST.get('overflow_kiosk', 0)),
+                overflow_2=int(request.POST.get('overflow_2', 0)),
+                black_top=int(request.POST.get('black_top', 0)),
+                return_line=int(request.POST.get('return_line', 0)),
+                mecanico=int(request.POST.get('mecanico', 0)),
+                gas_run=int(request.POST.get('gas_run', 0)),
+                
+                forecasted_drops=int(request.POST.get('forecasted_drops', 0)),
                 observacoes=request.POST.get('observacoes', ''),
-                problemas_encontrados=request.POST.get('problemas_encontrados', ''),
-                produtos_utilizados=request.POST.get('produtos_utilizados', ''),
-                avaliacao_qualidade=request.POST.get('avaliacao_qualidade') or None,
+                
                 status='concluido'  # Já marca como concluído por padrão
             )
             
             relatorio.save()
-            messages.success(request, f'Relatório para o veículo {relatorio.placa_veiculo} criado com sucesso!')
+            messages.success(request, f'Relatório criado com sucesso! Total: {relatorio.total_count_cleaned_cars} carros limpos.')
             return redirect('reports:detail', pk=relatorio.pk)
             
         except Exception as e:
@@ -132,9 +132,6 @@ def relatorio_create(request):
     context = {
         'empresa': empresa,
         'data_hoje': date.today(),
-        'hora_atual': timezone.now().time().strftime('%H:%M'),
-        'tipos_servico': Relatorio.TIPO_SERVICO_CHOICES,
-        'condicoes': Relatorio.CONDICAO_VEICULO_CHOICES,
     }
     
     return render(request, 'reports/create.html', context)

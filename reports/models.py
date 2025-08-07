@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from dashboard.models import Empresa
 
 User = get_user_model()
 
@@ -12,67 +11,34 @@ class Relatorio(models.Model):
         ('cancelado', 'Cancelado'),
     ]
     
-    TIPO_SERVICO_CHOICES = [
-        ('limpeza_simples', 'Limpeza Simples'),
-        ('limpeza_completa', 'Limpeza Completa'),
-        ('enceramento', 'Enceramento'),
-        ('lavagem_motor', 'Lavagem do Motor'),
-        ('aspiracao', 'Aspiração'),
-        ('outros', 'Outros'),
-    ]
-    
-    CONDICAO_VEICULO_CHOICES = [
-        ('limpo', 'Limpo'),
-        ('sujo', 'Sujo'),
-        ('muito_sujo', 'Muito Sujo'),
-        ('necessita_manutencao', 'Necessita Manutenção'),
-    ]
-    
     # Relacionamentos
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relatorios')
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='relatorios')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='relatorios_cartrack')
+    empresa = models.ForeignKey('dashboard.Empresa', on_delete=models.CASCADE, related_name='relatorios_cartrack')
     
     # Dados básicos do relatório
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     data_servico = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='rascunho')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='concluido')
     
-    # Dados do veículo
-    placa_veiculo = models.CharField(max_length=10, help_text='Ex: ABC-1234')
-    modelo_veiculo = models.CharField(max_length=100, blank=True)
-    cor_veiculo = models.CharField(max_length=50, blank=True)
-    quilometragem = models.PositiveIntegerField(blank=True, null=True)
+    # Campos de contagem de carros - TODOS NUMÉRICOS
+    ready_line = models.PositiveIntegerField(default=0, help_text='Ready line')
+    vip_line = models.PositiveIntegerField(default=0, help_text='VIP line')
+    overflow_kiosk = models.PositiveIntegerField(default=0, help_text='Overflow Kiosk')
+    overflow_2 = models.PositiveIntegerField(default=0, help_text='Overflow 2')
+    black_top = models.PositiveIntegerField(default=0, help_text='Black top')
+    return_line = models.PositiveIntegerField(default=0, help_text='Return')
+    mecanico = models.PositiveIntegerField(default=0, help_text='Mecânico')
+    gas_run = models.PositiveIntegerField(default=0, help_text='Gas run')
     
-    # Detalhes do serviço
-    tipo_servico = models.CharField(max_length=30, choices=TIPO_SERVICO_CHOICES)
-    condicao_inicial = models.CharField(max_length=30, choices=CONDICAO_VEICULO_CHOICES)
-    condicao_final = models.CharField(max_length=30, choices=CONDICAO_VEICULO_CHOICES)
+    # Total calculado automaticamente
+    total_count_cleaned_cars = models.PositiveIntegerField(default=0, help_text='Total count of cleaned cars')
     
-    # Tempo de serviço
-    hora_inicio = models.TimeField()
-    hora_fim = models.TimeField(blank=True, null=True)
+    # Previsão
+    forecasted_drops = models.PositiveIntegerField(default=0, help_text='Forecasted drops')
     
-    # Observações e detalhes
-    observacoes = models.TextField(blank=True, help_text='Observações gerais sobre o serviço')
-    problemas_encontrados = models.TextField(blank=True, help_text='Problemas ou danos identificados')
-    produtos_utilizados = models.TextField(blank=True, help_text='Lista de produtos utilizados')
-    
-    # Localização
-    local_servico = models.CharField(max_length=200, blank=True, help_text='Local onde foi realizado o serviço')
-    
-    # Fotos (campos para URLs das imagens)
-    foto_antes = models.URLField(blank=True, help_text='Foto do veículo antes do serviço')
-    foto_depois = models.URLField(blank=True, help_text='Foto do veículo após o serviço')
-    foto_adicional = models.URLField(blank=True, help_text='Foto adicional se necessário')
-    
-    # Controle de qualidade
-    avaliacao_qualidade = models.PositiveSmallIntegerField(
-        choices=[(i, i) for i in range(1, 6)], 
-        blank=True, 
-        null=True,
-        help_text='Avaliação de 1 a 5'
-    )
+    # Observações opcionais
+    observacoes = models.TextField(blank=True, help_text='Observações adicionais')
     
     class Meta:
         verbose_name = 'Relatório'
@@ -80,41 +46,29 @@ class Relatorio(models.Model):
         ordering = ['-data_criacao']
         
     def __str__(self):
-        return f"Relatório {self.placa_veiculo} - {self.data_servico} ({self.get_status_display()})"
-    
-    @property
-    def duracao_servico(self):
-        """Calcula a duração do serviço em minutos"""
-        if self.hora_fim and self.hora_inicio:
-            inicio = self.hora_inicio
-            fim = self.hora_fim
-            # Convertendo para minutos desde meia-noite
-            inicio_min = inicio.hour * 60 + inicio.minute
-            fim_min = fim.hour * 60 + fim.minute
-            return fim_min - inicio_min
-        return None
-    
-    @property
-    def duracao_formatada(self):
-        """Retorna a duração formatada como string"""
-        duracao = self.duracao_servico
-        if duracao:
-            horas = duracao // 60
-            minutos = duracao % 60
-            if horas > 0:
-                return f"{horas}h {minutos}min"
-            else:
-                return f"{minutos}min"
-        return "N/A"
+        return f"Relatório {self.data_servico} - Total: {self.total_count_cleaned_cars} carros"
     
     def save(self, *args, **kwargs):
+        # Calcular total automaticamente
+        self.total_count_cleaned_cars = (
+            self.ready_line + 
+            self.vip_line + 
+            self.overflow_kiosk + 
+            self.overflow_2 + 
+            self.black_top + 
+            self.return_line + 
+            self.mecanico + 
+            self.gas_run
+        )
+        
         # Se não foi definida empresa, usa a empresa ativa do usuário
         if not self.empresa_id and self.usuario:
             try:
-                from dashboard.models import EmpresaAtivaUsuario
+                from django.apps import apps
+                EmpresaAtivaUsuario = apps.get_model('dashboard', 'EmpresaAtivaUsuario')
                 empresa_ativa = EmpresaAtivaUsuario.objects.get(usuario=self.usuario)
                 self.empresa = empresa_ativa.empresa
-            except EmpresaAtivaUsuario.DoesNotExist:
+            except Exception:
                 pass
         
         super().save(*args, **kwargs)
