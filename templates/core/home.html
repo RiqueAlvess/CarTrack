@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Início - CarTrack</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        margin-bottom: 70px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      .navbar-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #dee2e6;
+        z-index: 1030;
+      }
+
+      .nav-link.active {
+        color: #0d6efd !important;
+        font-weight: 600;
+      }
+
+      .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        border: none;
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-3 mb-4">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 class="mb-1">Olá, Usuário!</h4>
+          <p class="text-muted mb-0">Sistema de Relatórios de Carros</p>
+        </div>
+        <a
+          href="{% url 'accounts:logout' %}"
+          class="btn btn-outline-danger btn-sm"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Quick Action Button -->
+      <div class="mb-4">
+        <a href="{% url 'reports:create' %}" class="btn btn-primary w-100 py-3">
+          <i class="bi bi-plus-circle me-2"></i>
+          <strong>Novo Relatório</strong>
+        </a>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <div class="card text-center">
+            <div class="card-body py-3">
+              <i class="bi bi-clipboard-data fs-2 text-primary mb-2"></i>
+              <h5 class="card-title text-primary mb-1">3</h5>
+              <p class="card-text small text-muted">Relatórios Hoje</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card text-center">
+            <div class="card-body py-3">
+              <i class="bi bi-check-circle fs-2 text-success mb-2"></i>
+              <h5 class="card-title text-success mb-1">Enviado</h5>
+              <p class="card-text small text-muted">
+                Último Envio<br /><small>08:30</small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Access -->
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="bi bi-lightning me-2"></i>
+            Acesso Rápido
+          </h6>
+        </div>
+        <div class="list-group list-group-flush">
+          <a
+            href="{% url 'reports:list' %}"
+            class="list-group-item list-group-item-action d-flex align-items-center"
+          >
+            <i class="bi bi-clock-history me-3 text-primary"></i>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Ver Histórico Completo</div>
+              <small class="text-muted">Todos os relatórios</small>
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+
+          <a
+            href="{% url 'dashboard:dashboard' %}"
+            class="list-group-item list-group-item-action d-flex align-items-center"
+          >
+            <i class="bi bi-bar-chart me-3 text-success"></i>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Dashboard</div>
+              <small class="text-muted">Métricas e indicadores</small>
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div
+              class="bg-success rounded-circle me-3"
+              style="width: 12px; height: 12px"
+            ></div>
+            <div class="flex-grow-1">
+              <div class="fw-semibold text-success">Sistema Online</div>
+              <small class="text-muted">Todos os serviços funcionando</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="navbar-bottom">
+      <div class="container-fluid">
+        <div class="row w-100 text-center">
+          <div class="col">
+            <a
+              href="{% url 'core:home' %}"
+              class="nav-link text-decoration-none active"
+            >
+              <i class="bi bi-house fs-5"></i>
+              <div class="small">Início</div>
+            </a>
+          </div>
+          <div class="col">
+            <a
+              href="{% url 'reports:list' %}"
+              class="nav-link text-decoration-none"
+            >
+              <i class="bi bi-clipboard-data fs-5"></i>
+              <div class="small">Relatórios</div>
+            </a>
+          </div>
+          <div class="col">
+            <a
+              href="{% url 'dashboard:dashboard' %}"
+              class="nav-link text-decoration-none"
+            >
+              <i class="bi bi-bar-chart fs-5"></i>
+              <div class="small">Dashboard</div>
+            </a>
+          </div>
+          <div class="col">
+            <a
+              href="{% url 'emails:list' %}"
+              class="nav-link text-decoration-none"
+            >
+              <i class="bi bi-envelope fs-5"></i>
+              <div class="small">E-mails</div>
+            </a>
+          </div>
+          <div class="col">
+            <a
+              href="{% url 'accounts:profile' %}"
+              class="nav-link text-decoration-none"
+            >
+              <i class="bi bi-person fs-5"></i>
+              <div class="small">Perfil</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

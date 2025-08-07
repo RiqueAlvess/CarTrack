@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - CarTrack</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
+        border: none;
+      }
+
+      .login-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+        padding: 2rem 1.5rem 1.5rem;
+        text-align: center;
+      }
+
+      .login-body {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-control {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+      }
+
+      .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+      }
+
+      .btn-login {
+        background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.3);
+      }
+
+      .app-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+      }
+
+      .input-group-text {
+        background: transparent;
+        border-right: none;
+        border-radius: 0.5rem 0 0 0.5rem;
+        border: 2px solid #e9ecef;
+        border-right: none;
+      }
+
+      .input-group .form-control {
+        border-left: none;
+        border-radius: 0 0.5rem 0.5rem 0;
+      }
+
+      .input-group:focus-within .input-group-text {
+        border-color: #0d6efd;
+      }
+
+      .alert {
+        border-radius: 0.5rem;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          <div class="card login-card">
+            <div class="login-header">
+              <div class="app-icon">
+                <i class="bi bi-car-front-fill fs-1"></i>
+              </div>
+              <h3 class="mb-0">CarTrack</h3>
+              <p class="mb-0 opacity-75">Sistema de Relatórios de Carros</p>
+            </div>
+
+            <div class="login-body">
+              <!-- Messages -->
+              {% if messages %} {% for message in messages %}
+              <div
+                class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                role="alert"
+              >
+                {{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                ></button>
+              </div>
+              {% endfor %} {% endif %}
+
+              <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                  <label for="email" class="form-label fw-semibold"
+                    >E-mail</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-envelope"></i>
+                    </span>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="seu@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="password" class="form-label fw-semibold"
+                    >Senha</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Sua senha"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>
+                  Entrar
+                </button>
+              </form>
+
+              <div class="text-center mt-4">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Usuários são criados pelo administrador
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
